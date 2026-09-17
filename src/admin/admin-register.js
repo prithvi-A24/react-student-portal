@@ -1,30 +1,28 @@
 import React, { useState } from 'react';
-
 import { useNavigate } from 'react-router-dom';
 
-import { db } from '../firebaseConfig';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 
-import { collection, doc, setDoc } from 'firebase/firestore';
+import { db, auth } from '../firebaseConfig';
 
 import styles from './admin-register.module.css';
 
 const AdminRegister = () => {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     adminName: '',
     email: '',
     username: '',
     password: '',
   });
-  const [loading, setLoading] = useState(false);
 
-  // Generate random ID
-  const generateId = () => {
-    return 'A' + Math.random().toString(36).substr(2, 9).toUpperCase();
-  };
+  const [loading, setLoading] = useState(false);
 
   const handleChange = e => {
     const { name, value } = e.target;
+
     setFormData(prev => ({
       ...prev,
       [name]: value,
@@ -33,43 +31,140 @@ const AdminRegister = () => {
 
   const handleSubmit = async e => {
     e.preventDefault();
+
     setLoading(true);
 
     try {
-      if (!formData.adminName || !formData.email || !formData.username || !formData.password) {
+      /*
+       * ---------------------------------------------------------
+       * 1. Validate the form
+       * ---------------------------------------------------------
+       */
+
+      if (
+        !formData.adminName ||
+        !formData.email ||
+        !formData.username ||
+        !formData.password
+      ) {
         alert('Please fill in all fields');
-        setLoading(false);
         return;
       }
 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
       if (!emailRegex.test(formData.email)) {
         alert('Please enter a valid email address');
-        setLoading(false);
         return;
       }
 
-      const adminId = generateId();
+      /*
+       * Firebase Authentication requires a minimum
+       * password length of 6 characters.
+       */
+
+      if (formData.password.length < 6) {
+        alert('Password must be at least 6 characters');
+        return;
+      }
+
+      /*
+       * ---------------------------------------------------------
+       * 2. Create the user in Firebase Authentication
+       * ---------------------------------------------------------
+       *
+       * Firebase handles the password.
+       *
+       * We DO NOT store the password in Firestore.
+       */
+
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+
+      const user = userCredential.user;
+
+      console.log('Firebase user created:', user.uid);
+
+      /*
+       * ---------------------------------------------------------
+       * 3. Create the admin profile in Firestore
+       * ---------------------------------------------------------
+       *
+       * Firebase Authentication gives us a unique UID.
+       *
+       * We use that UID as:
+       *
+       * admins/{uid}
+       *
+       * Notice that the password is NOT stored here.
+       */
+
       const adminData = {
-        _id: adminId,
-        ...formData,
+        uid: user.uid,
+        adminName: formData.adminName,
+        email: formData.email,
+        username: formData.username,
+        role: 'admin',
       };
 
-      // Save to Firestore
-      const adminRef = doc(db, 'admins', adminId);
-      await setDoc(adminRef, adminData);
+      await setDoc(doc(db, 'admins', user.uid), adminData);
+
+      /*
+       * ---------------------------------------------------------
+       * 4. Registration successful
+       * ---------------------------------------------------------
+       */
 
       alert('Admin registered successfully!');
+
       navigate('/login');
+
     } catch (error) {
-      // Error handling
-      if (error.code === 'permission-denied') {
-        alert('Permission denied. Please check your Firebase configuration.');
-      } else if (error.code === 'unavailable') {
-        alert('Firestore database is not available. Please check your connection.');
-      } else {
+      console.error('Registration error:', error);
+
+      /*
+       * ---------------------------------------------------------
+       * Firebase Authentication errors
+       * ---------------------------------------------------------
+       */
+
+      if (error.code === 'auth/email-already-in-use') {
+        alert('This email is already registered.');
+      }
+
+      else if (error.code === 'auth/invalid-email') {
+        alert('The email address is invalid.');
+      }
+
+      else if (error.code === 'auth/weak-password') {
+        alert('Password is too weak. Use at least 6 characters.');
+      }
+
+      /*
+       * ---------------------------------------------------------
+       * Firestore errors
+       * ---------------------------------------------------------
+       */
+
+      else if (error.code === 'permission-denied') {
+        alert(
+          'Firebase Authentication succeeded, but Firestore denied the profile write. Check your Firestore rules.'
+        );
+      }
+
+      else if (error.code === 'unavailable') {
+        alert(
+          'Firestore is currently unavailable. Please check your connection.'
+        );
+      }
+
+      else {
         alert(`Registration failed: ${error.message}`);
       }
+
     } finally {
       setLoading(false);
     }
@@ -78,8 +173,16 @@ const AdminRegister = () => {
   return (
     <div className={styles.registerContainer}>
       <div className={styles.glassCard}>
-        <h2 className={styles.title}>Admin Registration</h2>
-        <form onSubmit={handleSubmit} className={styles.registerForm}>
+
+        <h2 className={styles.title}>
+          Admin Registration
+        </h2>
+
+        <form
+          onSubmit={handleSubmit}
+          className={styles.registerForm}
+        >
+
           <div className={styles.formGroup}>
             <input
               type="text"
@@ -128,14 +231,24 @@ const AdminRegister = () => {
             />
           </div>
 
-          <button type="submit" className={styles.submitButton} disabled={loading}>
+          <button
+            type="submit"
+            className={styles.submitButton}
+            disabled={loading}
+          >
             {loading ? 'Registering...' : 'Register'}
           </button>
+
         </form>
 
         <p className={styles.loginLink}>
-          Already have an account? <span onClick={() => navigate('/login')}>Login here</span>
+          Already have an account?{' '}
+
+          <span onClick={() => navigate('/login')}>
+            Login here
+          </span>
         </p>
+
       </div>
     </div>
   );
