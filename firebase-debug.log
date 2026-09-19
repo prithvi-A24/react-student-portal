@@ -1,0 +1,48 @@
+[debug] [2026-09-19T14:28:59.069Z] ----------------------------------------------------------------------
+[debug] [2026-09-19T14:28:59.071Z] Command:       /home/prithvi/.nvm/versions/node/v20.20.2/bin/node /home/prithvi/.nvm/versions/node/v20.20.2/bin/firebase init hosting:github
+[debug] [2026-09-19T14:28:59.071Z] CLI Version:   15.28.1
+[debug] [2026-09-19T14:28:59.071Z] Platform:      linux
+[debug] [2026-09-19T14:28:59.071Z] Node Version:  v20.20.2
+[debug] [2026-09-19T14:28:59.071Z] Detected Agent: unknown
+[debug] [2026-09-19T14:28:59.071Z] Time:          Sat Sep 19 2026 14:28:59 GMT+0000 (Coordinated Universal Time)
+[debug] [2026-09-19T14:28:59.071Z] ----------------------------------------------------------------------
+[debug] 
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /home/prithvi/react-student-portal/react-student-portal
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] 
+[debug] [2026-09-19T14:28:59.818Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-09-19T14:28:59.818Z] > authorizing via signed-in user (prithviamarnath44@gmail.com)
+[debug] [2026-09-19T14:28:59.819Z] Checked if tokens are valid: true, expires at: 1789829565578
+[debug] [2026-09-19T14:28:59.819Z] Checked if tokens are valid: true, expires at: 1789829565578
+[debug] [2026-09-19T14:28:59.820Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/firebase-testing-508806 [none]
+[debug] [2026-09-19T14:29:00.402Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/firebase-testing-508806 200
+[debug] [2026-09-19T14:29:00.402Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/firebase-testing-508806 {"projectId":"firebase-testing-508806","projectNumber":"815872975118","displayName":"Firebase-testing","name":"projects/firebase-testing-508806","resources":{"hostingSite":"fir-testing-508806"},"state":"ACTIVE","labels":{"firebase":"enabled"},"etag":"1_aa31d509-84dd-4177-8b56-d50c5633d15c"}
+[info] i  Using project firebase-testing-508806 (Firebase-testing) . 
+[info] 
+=== Hosting:github Setup
+[info] 
+[info] i  Detected a .git folder at /home/prithvi/react-student-portal/react-student-portal 
+[info] i  Authorizing with GitHub to upload your service account to a GitHub repository's secrets store. 
+[info] 
+[info] Visit this URL on this device to log in:
+[info] https://github.com/login/oauth/authorize?client_id=89cf50f02ac6aaed3484&state=37990408&redirect_uri=http%3A%2F%2Flocalhost%3A9005&scope=read%3Auser%20repo%20public_repo
+[info] 
+[info] Waiting for authentication...
